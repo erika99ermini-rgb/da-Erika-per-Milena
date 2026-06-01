@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Per te 💌</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;600&display=swap" rel="stylesheet">
+
+<style>
+
+/* 🌿 BASE */
+body{
+margin:0;
+height:100vh;
+overflow:hidden;
+font-family:sans-serif;
+background: radial-gradient(circle at top,#fff6e8,#eaf7ef);
+}
+
+/* 🌸 PETALI */
+.petal{
+position:absolute;
+top:-10vh;
+font-size:22px;
+animation:fall linear infinite;
+opacity:0.8;
+}
+
+@keyframes fall{
+to{ transform:translateY(120vh) rotate(360deg); }
+}
+
+/* ================= SCENA 1 ================= */
+
+.scene-envelope{
+position:fixed;
+inset:0;
+display:flex;
+justify-content:center;
+align-items:center;
+transition:1s ease;
+}
+
+.scene-envelope.fade-out{
+opacity:0;
+transform:scale(1.05);
+}
+
+/* ✉️ BUSTA */
+.envelope{
+width:340px;
+height:230px;
+position:relative;
+cursor:pointer;
+transition:0.6s ease;
+}
+
+.base{
+width:100%;
+height:100%;
+background:#fffaf2;
+border:2px solid #e6d6b5;
+border-radius:8px;
+position:absolute;
+box-shadow:0 20px 60px rgba(0,0,0,.15);
+}
+
+.flap{
+width:100%;
+height:100%;
+position:absolute;
+background:#f3e1c2;
+clip-path:polygon(0 0,100% 0,50% 60%);
+transform-origin:top;
+transition:1.3s cubic-bezier(.77,0,.18,1);
+z-index:5;
+}
+
+.open .flap{
+transform:rotateX(180deg);
+}
+
+/* 🔥 TESTO INTERATTIVO */
+.hint-open{
+position:absolute;
+bottom:18px;
+width:100%;
+text-align:center;
+font-family:sans-serif;
+font-size:14px;
+color:#6b5a3e;
+opacity:0.9;
+cursor:pointer;
+user-select:none;
+transition:0.3s ease;
+animation:pulse 1.6s infinite;
+z-index:10;
+}
+
+.hint-open:hover{
+transform:scale(1.05);
+opacity:1;
+}
+
+.hint-open:active{
+transform:scale(0.95);
+}
+
+/* pulse animato */
+@keyframes pulse{
+0%{ transform:scale(1); }
+50%{ transform:scale(1.06); }
+100%{ transform:scale(1); }
+}
+
+/* ================= SCENA 2 ================= */
+
+.scene-photo{
+position:fixed;
+inset:0;
+display:none;
+justify-content:center;
+align-items:center;
+background: radial-gradient(circle at top,#fffaf2,#fff2e6);
+animation:fadeIn 1s ease;
+}
+
+@keyframes fadeIn{
+from{opacity:0}
+to{opacity:1}
+}
+
+.photo-card{
+width:240px;
+height:320px;
+perspective:1000px;
+animation:float 3s ease-in-out infinite;
+}
+
+@keyframes float{
+0%,100%{transform:translateY(0)}
+50%{transform:translateY(-8px)}
+}
+
+.photo-inner{
+width:100%;
+height:100%;
+transition:1.2s cubic-bezier(.77,0,.18,1);
+transform-style:preserve-3d;
+}
+
+.rotate{
+transform:rotateY(180deg);
+}
+
+.photo-front,.photo-back{
+position:absolute;
+width:100%;
+height:100%;
+backface-visibility:hidden;
+border-radius:14px;
+overflow:hidden;
+box-shadow:0 25px 50px rgba(0,0,0,.25);
+}
+
+.photo-front img{
+width:100%;
+height:100%;
+object-fit:cover;
+}
+
+/* ================= SCENA 3 ================= */
+
+.scene-letter{
+position:fixed;
+inset:0;
+display:none;
+background:linear-gradient(135deg,#fffaf2,#fff2e6);
+padding:40px 20px;
+box-sizing:border-box;
+animation:fadeIn 1.2s ease;
+}
+
+.letter-box{
+max-width:650px;
+margin:auto;
+font-family:'Dancing Script',cursive;
+animation:fadeIn 1.2s ease;
+}
+
+h1{
+text-align:center;
+color:#c44c4c;
+font-size:34px;
+margin-bottom:12px;
+}
+
+#text{
+font-size:21px;
+line-height:1.8;
+white-space:pre-wrap;
+overflow-y:auto;
+max-height:70vh;
+padding-right:10px;
+scroll-behavior:smooth;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- 🌸 BUSTA -->
+<div class="scene-envelope" id="envScene">
+
+<div class="envelope" id="env">
+
+<div class="flap"></div>
+<div class="base"></div>
+
+<div class="hint-open">Clicca qui per aprire ✉️</div>
+
+</div>
+
+</div>
+
+<!-- 📷 FOTO -->
+<div class="scene-photo" id="photoScene">
+
+<div class="photo-card">
+<div class="photo-inner" id="photoInner">
+
+<div class="photo-front">
+<img src="foto.jpg">
+</div>
+
+<div class="photo-back"></div>
+
+</div>
+</div>
+
+</div>
+
+<!-- 💌 LETTERA -->
+<div class="scene-letter" id="letterScene">
+
+<div class="letter-box">
+<h1>Per te 💖</h1>
+<div id="text"></div>
+</div>
+
+</div>
+
+<script>
+
+/* 🌸 PETALI */
+const emojis=["🌸","🌷","🌼","🌺","💮"];
+for(let i=0;i<25;i++){
+let d=document.createElement("div");
+d.className="petal";
+d.innerHTML=emojis[Math.floor(Math.random()*emojis.length)];
+d.style.left=Math.random()*100+"vw";
+d.style.animationDuration=(6+Math.random()*10)+"s";
+d.style.animationDelay=(-Math.random()*10)+"s";
+document.body.appendChild(d);
+}
+
+const env=document.getElementById("env");
+const envScene=document.getElementById("envScene");
+
+const photoScene=document.getElementById("photoScene");
+const photoInner=document.getElementById("photoInner");
+
+const letterScene=document.getElementById("letterScene");
+
+let started=false;
+
+/* 💌 TESTO */
+const message = `Mili Mili,
+
+intanto tantissimi auguri di buon compleanno! Non posso dilungarmi troppo con le parole, altrimenti rischio di non sapere più cosa scrivere nei ringraziamenti della tesi, ma questo è un giorno importante e, come da tradizione, ci tenevo a dedicarti qualche pensiero.
+
+È quasi scontato dire che sei il sole del nostro trio, ma io lo penso davvero. Se c'è una persona che riesce sempre a tirarmi su il morale, quella sei tu. Sei la tua energia contagiosa, il tuo modo di esserci sempre, la capacità che hai di rendere più leggere anche le giornate più pesanti. Sei la nostra passione condivisa per quelle cose di cui Ilaria continua a sapere veramente poco (e qui un po' di vergogna ci vuole: in tre anni non siamo riuscite a insegnarle praticamente nulla!).
+
+Sei i tuoi "amò" pronunciati con quella cadenza siciliana che ancora oggi ci chiediamo da dove sia saltata fuori. Sei tutte le risate, le chiacchiere infinite, i momenti belli e quelli difficili affrontati insieme. Sei anche tutti gli abbracci che ci siamo scambiate, quelli dati per festeggiare e quelli dati semplicemente perché ce n'era bisogno.
+
+Resta sempre così come sei: autentica, luminosa e speciale. Non cambiare mai quel modo tutto tuo di prenderti cura delle persone che ami, perché è una delle cose più belle che hai. Così io saprò sempre dove trovarti e, soprattutto, riconoscerti in mezzo a qualsiasi cambiamento che la vita ci porterà.
+
+Ti auguro un compleanno pieno di sorrisi, affetto e di tutto ciò che ti rende felice, perché te lo meriti davvero.
+
+Buon compleanno.
+
+Tua E. ❤️`;
+
+env.addEventListener("click",start);
+env.addEventListener("touchstart",start);
+
+function start(){
+
+if(started) return;
+started=true;
+
+/* 1 busta */
+env.classList.add("open");
+
+/* 2 fade scena */
+setTimeout(()=>{
+envScene.classList.add("fade-out");
+},1200);
+
+/* 3 scena foto */
+setTimeout(()=>{
+envScene.style.display="none";
+photoScene.style.display="flex";
+},2000);
+
+const photoTime = 5000; // ⬅️ 5 secondi
+
+/* 4 rotazione foto dopo 5s */
+setTimeout(()=>{
+photoInner.classList.add("rotate");
+}, photoTime);
+
+/* 5 lettera dopo altri 1.5s (puoi regolare) */
+setTimeout(()=>{
+photoScene.style.display="none";
+letterScene.style.display="block";
+type();
+}, photoTime + 1500);
+
+}
+
+/* ✍️ SCRITTURA + AUTO SCROLL */
+function type(){
+
+let i=0;
+const el=document.getElementById("text");
+
+function step(){
+if(i<message.length){
+el.innerHTML+=message[i];
+i++;
+const target = el.scrollHeight;
+let current = el.scrollTop;
+
+el.scrollTop = current + (target - current) * 0.08;
+setTimeout(step,17);
+}
+}
+
+step();
+}
+
+</script>
+
+</body>
+</html>
